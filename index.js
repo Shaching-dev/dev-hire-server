@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 // database connect
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const client = new MongoClient(process.env.URI, {
   serverApi: {
@@ -63,12 +63,10 @@ async function run() {
     app.get("/users", async (req, res) => {
       try {
         const email = req.query.email;
-
         const query = {};
         if (email) {
           query.email = email;
         }
-
         const cursor = userCollection.find(query);
         const result = await cursor.toArray();
         res.status(200).json({
@@ -80,6 +78,26 @@ async function run() {
         res.status(500).json({
           message: "Something went wrong",
           success: false,
+        });
+      }
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+
+        const result = await userCollection.deleteOne(query);
+        res.status(200).json({
+          message: "user deleted successfully",
+          data: result,
+          success: true,
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: "Something went wrong",
+          res: error,
+          succces: false,
         });
       }
     });
