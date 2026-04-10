@@ -60,6 +60,23 @@ async function run() {
       }
     });
 
+    app.get("/users", async (req, res) => {
+      try {
+        const cursor = userCollection.find();
+        const result = await cursor.toArray();
+        res.status(200).json({
+          message: "users get successfully",
+          data: result,
+          success: true,
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: "Something went wrong",
+          success: false,
+        });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
