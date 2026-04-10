@@ -62,7 +62,14 @@ async function run() {
 
     app.get("/users", async (req, res) => {
       try {
-        const cursor = userCollection.find();
+        const email = req.query.email;
+
+        const query = {};
+        if (email) {
+          query.email = email;
+        }
+
+        const cursor = userCollection.find(query);
         const result = await cursor.toArray();
         res.status(200).json({
           message: "users get successfully",
