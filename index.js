@@ -29,6 +29,7 @@ async function run() {
 
     const db = client.db("dev_hire_collection");
     const userCollection = db.collection("users");
+    const jobCollection = db.collection("jobs");
 
     app.post("/users", async (req, res) => {
       try {
@@ -100,6 +101,30 @@ async function run() {
           succces: false,
         });
       }
+    });
+
+    app.post("/jobs", async (req, res) => {
+      try {
+        const jobs = req.body;
+        const result = await jobCollection.insertOne(jobs);
+        res.status(201).json({
+          message: "successfully posted job",
+          data: result.insertedId,
+          success: true,
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: "Something went wrong",
+          error: error,
+          success: false,
+        });
+      }
+    });
+
+    app.get("/jobs", async (req, res) => {
+      const cursor = jobCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
